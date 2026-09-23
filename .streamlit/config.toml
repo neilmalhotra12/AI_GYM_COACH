@@ -1,2 +1,9 @@
 [server]
 runOnSave = true
+
+[theme]
+base = "light"
+primaryColor = "#444444"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#1e232b"
+textColor = "#FFFFFF"
