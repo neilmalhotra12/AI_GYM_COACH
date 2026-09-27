@@ -18,7 +18,7 @@ class ShoulderPressDetector(BaseExercise):
    RIGHT_KNEE = 26
 
    def __init__(self):
-      super.__init__()
+      super().__init__()
 
    def reset(self) -> None:
       self.reps = 0

@@ -6,6 +6,7 @@ from services.config.workout_config import EXERCISE_OPTIONS
 from services.ui.style_loader import load_css, inject_local_font
 from services.persistence.exercise_repository import init_db
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
+from services.vision.exercise_video_processor import VideoProcessorClass
 
 def main():
    st.set_page_config(page_title="AI Real-time GYM Coach", page_icon="🏋️", initial_sidebar_state="expanded", layout="centered")
@@ -136,15 +137,19 @@ def main():
       context = webrtc_streamer(
          key = "exercise-analysis",
          mode = WebRtcMode.SENDRECV,
-         video_processor_factory=None,
+         video_processor_factory=VideoProcessorClass,
          rtc_configuration={"iceServers": [
             {"urls": ["stun:stun.l.google.com:19302"]}
         ]},
         media_stream_constraints={
-           "video": True,
+           "video": {
+               "width": {"ideal": 640},
+               "height": {"ideal": 480},
+               "frameRate": {"ideal": 20},
+            },
            "audio": False
         },
-        async_processing=True
+        async_processing=False
       )
 
    st.divider()
