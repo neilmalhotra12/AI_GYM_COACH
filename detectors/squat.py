@@ -40,7 +40,7 @@ class SquatDetector(BaseExercise):
       right_visibility = landmarks[self.RIGHT_KNEE].visibility
 
       if left_visibility >= right_visibility:
-         knee_angle = left_knee_angle,
+         knee_angle = left_knee_angle
          hip_idx, knee_idx, ankle_idx, shoulder_idx = 23, 25, 27, 11
       else:
          knee_angle = right_knee_angle

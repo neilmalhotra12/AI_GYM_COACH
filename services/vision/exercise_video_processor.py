@@ -15,6 +15,7 @@ import mediapipe as mp
 import av
 
 import time
+import traceback
 
 
 class VideoProcessorClass(VideoProcessorBase):
@@ -187,75 +188,42 @@ class VideoProcessorClass(VideoProcessorBase):
          2,
       )
 
-   # def recv(self, frame):
-   #    print("RECV CALLED")
-
-   #    image = np.asarray(
-   #       cv2.flip(frame.to_ndarray(format="bgr24"), 1),
-   #       dtype=np.uint8,
-   #    )
-
-   #    mp_image = mp.Image(
-   #       image_format = mp.ImageFormat.SRGB,
-   #       data = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-   #    )
-
-   #    self._frame_timestamps_ms += 30
-
-   #    result = self._landmarker.detect_for_video(mp_image, self._frame_timestamps_ms)
-
-   #    print("MEDIAPIPE DONE")
-
-   #    return av.VideoFrame.from_ndarray(
-   #       image,
-   #       format="bgr24"
-   #    )
-
    def recv(self, frame):
       print("RECV CALLED")
-      self._frame_count += 1
-
 
       image = np.asarray(
          cv2.flip(frame.to_ndarray(format="bgr24"), 1),
-         dtype = np.uint8,
+         dtype=np.uint8,
       )
 
-      if self._frame_count % 2 == 0:
+      mp_image = mp.Image(
+         image_format = mp.ImageFormat.SRGB,
+         data = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+      )
 
-         mp_image = mp.Image(
-            image_format = mp.ImageFormat.SRGB,
-            data = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-         )
+      self._frame_timestamps_ms += 30
 
-         self._frame_timestamps_ms += 60
-         result = self._landmarker.detect_for_video(mp_image, self._frame_timestamps_ms)
+      result = self._landmarker.detect_for_video(mp_image, self._frame_timestamps_ms)
 
-         if result.pose_landmarks:
-            landmarks = result.pose_landmarks[0]
+      if result.pose_landmarks:
+         landmarks = result.pose_landmarks[0]
 
-            self._draw_skeleton(image, landmarks)
+         self._draw_skeleton(image, landmarks)
 
-            ex_type = self.get_exercise()
-            detector = self._detectors.get(ex_type)
+         ex_type = self.get_exercise()
+         detector = self._detectors.get(ex_type)
 
-            print("BEFORE DETECTOR")
-            start = time.perf_counter()
-            metrics = detector.process(landmarks)
-            end = time.perf_counter()
-            print(f"AFTER DETECTOR - {end - start:.4f} seconds")
-            # if detector:
-            #    metrics = detector.process(landmarks)
+         metrics = detector.process(landmarks)
 
-            #    self._draw_overlays(image, metrics, ex_type)
+         self._draw_overlays(image, metrics, ex_type)
 
-            #    self.set_latest_metrics(metrics)
-            
+         self.set_latest_metrics(metrics)
+      else: 
+         self._draw_no_pose_warnings(image)
 
-         # else:
-         #    self._draw_no_pose_warnings(image)
+      print("MEDIAPIPE DONE")
 
-      # if result.pose_landmarks:
-      #   print("POSE DETECTED")
-
-      return av.VideoFrame.from_ndarray(image, format="bgr24")
+      return av.VideoFrame.from_ndarray(
+         image,
+         format="bgr24"
+      )
