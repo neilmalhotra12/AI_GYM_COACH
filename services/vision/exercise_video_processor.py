@@ -221,7 +221,6 @@ class VideoProcessorClass(VideoProcessorBase):
       else: 
          self._draw_no_pose_warnings(image)
 
-      print("MEDIAPIPE DONE")
 
       return av.VideoFrame.from_ndarray(
          image,
